@@ -189,10 +189,10 @@ class Pixel:
         if isinstance(new_color, Color):
             # If this is a Color object, set our color variable to a copy of it
             self.__color = new_color.copy()
-        elif isinstance(new_color, tuple):
+        elif isinstance(new_color, list):
             # if its a tuple, make a Color object first
             if len(new_color) != 3:
-                raise ValueError("color tuple must be in format (r, g, b)")
+                raise ValueError("color list must be in format [r, g, b]")
             self.__color = Color(new_color[0], new_color[1], new_color[2])
         elif isinstance(new_color, Pixel):
             # if its a Pixel, create new Color object from its RGB
@@ -244,6 +244,8 @@ class Picture:
             # If we were given an existing pic, then create a copy of that
             self.__width = pic.get_width()
             self.__height = pic.get_height()
+
+            # FIXME: next line should change to __data
             self.__pixels = [[Pixel(pic.get_pixel(x, y), x, y) for x in
                 range(self.__width)] for y in range(self.__height)]
             self.__title = pic.get_title()
@@ -254,23 +256,29 @@ class Picture:
             self.__width = image.width
             self.__height = image.height
 
-            def get_image_pixel(img, x, y):
+            def get_image_rgb(img, x, y):
                 """Returns Pixel with color of pixel at (x,y) in given image."""
                 if img.mode == "RGB":
-                    color = img.getpixel((x,y))
+                    color = list(img.getpixel((x,y)))
                 elif img.mode == "L":
                     # luminence is grayscale... given as a single value
                     l = img.getpixel((x,y))
-                    color = (l, l, l)
+                    color = [l, l, l]
                 else:
                     print(img.mode)
                     raise RuntimeError("Image in %s has unsupported mode: %s" %
                             (filename, img.mode))
 
-                return Pixel(color, x, y)
+                return color
 
-            self.__pixels = [[get_image_pixel(image, x, y) 
-                for x in range(self.__width)] for y in range(self.__height)]
+            self.__data = [[get_image_rgb(image, x, y)
+                            for x in range(self.__width)]
+                                for y in range(self.__height)]
+
+            self.__pixels = [[Pixel(self.__data[y][x], x, y)
+                                for x in range(self.__width)]
+                                    for y in range(self.__height)]
+
             self.__title = title
 
         else:
@@ -278,7 +286,11 @@ class Picture:
             # specified width and height.
             self.__width = width
             self.__height = height
-            self.__pixels = [[Pixel(Black, x, y) for x in range(width)] for y in range(height)]
+            self.__data = [[[0, 0, 0] for x in range(width)] for y in range(height)]
+            self.__pixels = [[Pixel(self.__data[y][x], x, y)
+                                for x in range(self.__width)]
+                                    for y in range(self.__height)]
+            #self.__pixels = [[Pixel(Black, x, y) for x in range(width)] for y in range(height)]
             self.__title = title
 
     def copy(self):
@@ -311,36 +323,16 @@ class Picture:
 
     def show(self):
         """Displays the picture in a new window."""
-        #window = Toplevel()
         """
-        window = Tk()
-
-        if self.__title is not None:
-            window.title(self.__title)
-
-        canvas = Canvas(window, width=self.__width, height=self.__height)
-
-        def print_pixel(event):
-            print(self.get_pixel(event.x, event.y))
-
-        canvas.bind('<Button-1>', print_pixel) # bind left-click to printing pixel info
-        canvas.pack()
-
-        img = self.__get_image(window)
-        canvas.create_image((self.__width/2, self.__height/2), image=img, state="normal")
-
-        window.mainloop()
-        """
-
         img = []
         for y in range(self.__height):
             img.append([self.__pixels[y][x].get_rgb()
                         for x in range(self.__width)])
+        """
 
-        ax = plt.imshow(img)
+        ax = plt.imshow(self.__data)
         plt.tick_params(axis='x', bottom=False, top=True, labelbottom=False,
                         labeltop=True)
-        #ax.xaxis.tick_top()
         plt.show()
 
     def save(self, filename):
