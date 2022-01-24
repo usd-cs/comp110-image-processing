@@ -276,6 +276,7 @@ class Picture:
         self.__itery = 0
         return self
 
+
     def __next__(self):
         """Returns the next pixel for iteration."""
 
@@ -293,6 +294,14 @@ class Picture:
             raise StopIteration
 
 
+    def __getitem__(self, row):
+        """Returns a specific row of Pixels."""
+        if not isinstance(row, int):
+            raise TypeError("Row index must be an integer")
+
+        return self.__pixels[row]
+
+
 if __name__ == "__main__":
     pic = Picture(256, 512)
     pic.title = "Color Gradient"
@@ -300,7 +309,8 @@ if __name__ == "__main__":
     # create color gradient in picture
     for x in range(pic.width):
         for y in range(pic.height):
-            pix = pic.get_pixel(x,y)
+            #pix = pic.get_pixel(x,y)
+            pix = pic[y][x]
             pix.color = [x % 256, y % 256, (x+y) % 256]
 
     pic.show()
