@@ -145,9 +145,9 @@ class Picture:
 
         if pic is not None:
             # If we were given an existing pic, then create a copy of that
-            self.__width = pic.get_width()
-            self.__height = pic.get_height()
-            self.__title = pic.get_title()
+            self.__width = pic.width
+            self.__height = pic.height
+            self.__title = pic.title
 
             self.__data = [[pic.get_pixel(x, y).color
                             for x in range(self.__width)]
