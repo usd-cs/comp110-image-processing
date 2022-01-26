@@ -198,6 +198,10 @@ class Picture:
         self.__ax.tick_params(axis='x', bottom=False, top=True, labelbottom=False,
                         labeltop=True)
 
+        # make sure graph tick marks are always integer
+        self.__ax.xaxis.get_major_locator().set_params(integer=True)
+        self.__ax.yaxis.get_major_locator().set_params(integer=True)
+
     def copy(self):
         """Returns a copy of this Pixel object."""
         return Picture(pic=self)
