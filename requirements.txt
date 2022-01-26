@@ -23,7 +23,7 @@ idna==3.3
 importlib-resources==5.4.0
 ipykernel==6.7.0
 ipympl==0.8.7
-ipython==8.0.1
+ipython>=7.31
 ipython-genutils==0.2.0
 ipywidgets==7.6.5
 jedi==0.18.1
