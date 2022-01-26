@@ -193,6 +193,11 @@ class Picture:
                             for x in range(self.__width)]
                                 for y in range(self.__height)]
 
+        self.__fig, self.__ax = plt.subplots()
+        self.__image = self.__ax.imshow(self.__data)
+        self.__ax.tick_params(axis='x', bottom=False, top=True, labelbottom=False,
+                        labeltop=True)
+
     def copy(self):
         """Returns a copy of this Pixel object."""
         return Picture(pic=self)
@@ -218,12 +223,10 @@ class Picture:
         return self.__height
 
     def show(self):
-        """Displays the picture in a new window."""
-
-        ax = plt.imshow(self.__data)
-        plt.tick_params(axis='x', bottom=False, top=True, labelbottom=False,
-                        labeltop=True)
-        plt.show()
+        """Displays the picture."""
+        self.__image.set_data(self.__data)
+        self.__fig.canvas.draw()
+        self.__ax.set_title(self.title)
 
 
     def save(self, filename):
@@ -309,8 +312,9 @@ if __name__ == "__main__":
     # create color gradient in picture
     for x in range(pic.width):
         for y in range(pic.height):
-            #pix = pic.get_pixel(x,y)
-            pix = pic[y][x]
+            #pix = pic[y][x]
+            pix = pic.get_pixel(x,y)
             pix.color = [x % 256, y % 256, (x+y) % 256]
 
     pic.show()
+    plt.show()  # this is needed for it to actually display outside of jupyter
